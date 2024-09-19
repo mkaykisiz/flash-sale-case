@@ -1,0 +1,338 @@
+definitions:
+  app.AddFlashSaleRequest:
+    properties:
+      discount_percent:
+        type: integer
+      end_time:
+        type: string
+      product_id:
+        type: integer
+      start_time:
+        type: string
+      stock:
+        type: integer
+    type: object
+  app.AddFlashSaleResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  app.AddProductData:
+    properties:
+      is_active:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  app.Auth:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  app.BuyFlashSaleRequest:
+    properties:
+      unit:
+        type: integer
+    type: object
+  app.EditFlashSaleRequest:
+    properties:
+      discount_percent:
+        type: integer
+      end_time:
+        type: string
+      start_time:
+        type: string
+      stock:
+        type: integer
+    type: object
+  app.EditProductData:
+    properties:
+      is_active:
+        type: boolean
+      name:
+        type: string
+      stock:
+        type: integer
+    type: object
+  app.FlashSale:
+    properties:
+      discount_percent:
+        type: integer
+      id:
+        type: integer
+      product_id:
+        type: integer
+      stock:
+        type: integer
+    type: object
+  app.GetFlashSaleResponse:
+    properties:
+      discount_percent:
+        type: integer
+      id:
+        type: integer
+      product_id:
+        type: integer
+      stock:
+        type: integer
+    type: object
+  app.GetFlashSalesResponse:
+    properties:
+      count:
+        type: integer
+      flash_sales:
+        items:
+          $ref: '#/definitions/app.FlashSale'
+        type: array
+    type: object
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Flash Sale
+  version: "1.0"
+paths:
+  /api/v1/flash-sales:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.GetFlashSalesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Get flash sales
+      tags:
+      - FlashSale
+    post:
+      parameters:
+      - description: Add flash sale request body
+        in: body
+        name: add_flash_sale
+        required: true
+        schema:
+          $ref: '#/definitions/app.AddFlashSaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AddFlashSaleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Add Flash Sale
+      tags:
+      - FlashSale
+  /api/v1/flash-sales/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete flash sale
+      tags:
+      - FlashSale
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.GetFlashSaleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a single flash sale
+      tags:
+      - FlashSale
+    put:
+      parameters:
+      - description: Flash Sale ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Edit flash sale request body
+        in: body
+        name: edit_flash_sale
+        required: true
+        schema:
+          $ref: '#/definitions/app.EditFlashSaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Edit Flash Sale
+      tags:
+      - FlashSale
+  /api/v1/flash-sales/{id}/buy:
+    post:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Buy flash sale request body
+        in: body
+        name: buy_flash_sale
+        required: true
+        schema:
+          $ref: '#/definitions/app.BuyFlashSaleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Buy Flash Sale
+      tags:
+      - FlashSale
+  /api/v1/products:
+    post:
+      parameters:
+      - description: Add product request body
+        in: body
+        name: add_product
+        required: true
+        schema:
+          $ref: '#/definitions/app.AddProductData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Add product
+      tags:
+      - Product
+  /api/v1/products/{id}:
+    put:
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Edit product request body
+        in: body
+        name: edit_product
+        required: true
+        schema:
+          $ref: '#/definitions/app.EditProductData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - BearerAuth: []
+      summary: Update product
+      tags:
+      - Product
+  /auth:
+    post:
+      parameters:
+      - description: Auth request body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/app.Auth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Get Auth
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: token
+    type: apiKey
+swagger: "2.0"

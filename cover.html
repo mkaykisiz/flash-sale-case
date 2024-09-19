@@ -1,0 +1,2730 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>cron: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">flash_sale/cron/cron.go (0.0%)</option>
+				
+				<option value="file1">flash_sale/cron/flash_sale.go (0.0%)</option>
+				
+				<option value="file2">flash_sale/docs/docs.go (0.0%)</option>
+				
+				<option value="file3">flash_sale/main.go (0.0%)</option>
+				
+				<option value="file4">flash_sale/middleware/jwt/jwt.go (0.0%)</option>
+				
+				<option value="file5">flash_sale/models/flash_sale.go (0.0%)</option>
+				
+				<option value="file6">flash_sale/models/models.go (0.0%)</option>
+				
+				<option value="file7">flash_sale/models/order.go (0.0%)</option>
+				
+				<option value="file8">flash_sale/models/product.go (0.0%)</option>
+				
+				<option value="file9">flash_sale/models/user.go (0.0%)</option>
+				
+				<option value="file10">flash_sale/pkg/app/bind.go (0.0%)</option>
+				
+				<option value="file11">flash_sale/pkg/app/request.go (0.0%)</option>
+				
+				<option value="file12">flash_sale/pkg/app/response.go (0.0%)</option>
+				
+				<option value="file13">flash_sale/pkg/constants/msg.go (0.0%)</option>
+				
+				<option value="file14">flash_sale/pkg/file/file.go (0.0%)</option>
+				
+				<option value="file15">flash_sale/pkg/logging/file.go (0.0%)</option>
+				
+				<option value="file16">flash_sale/pkg/logging/log.go (0.0%)</option>
+				
+				<option value="file17">flash_sale/pkg/redis/redis.go (0.0%)</option>
+				
+				<option value="file18">flash_sale/pkg/setting/setting.go (0.0%)</option>
+				
+				<option value="file19">flash_sale/pkg/util/jwt.go (0.0%)</option>
+				
+				<option value="file20">flash_sale/pkg/util/md5.go (0.0%)</option>
+				
+				<option value="file21">flash_sale/pkg/util/util.go (0.0%)</option>
+				
+				<option value="file22">flash_sale/routers/api/auth.go (0.0%)</option>
+				
+				<option value="file23">flash_sale/routers/api/v1/flash_sale.go (0.0%)</option>
+				
+				<option value="file24">flash_sale/routers/api/v1/product.go (0.0%)</option>
+				
+				<option value="file25">flash_sale/routers/router.go (0.0%)</option>
+				
+				<option value="file26">flash_sale/service/auth_service/auth.go (0.0%)</option>
+				
+				<option value="file27">flash_sale/service/cache_service/flash_sale.go (0.0%)</option>
+				
+				<option value="file28">flash_sale/service/flash_sale_service/flash_sale.go (0.0%)</option>
+				
+				<option value="file29">flash_sale/service/product_service/product.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package cron
+
+import (
+        "flash_sale/pkg/logging"
+        "github.com/robfig/cron/v3"
+)
+
+// SetupCronJobs initializes and starts cron jobs
+func SetupCronJobs() <span class="cov0" title="0">{
+        c := cron.New()
+
+        _, err := c.AddFunc("* * * * *", SyncFlashSale)
+
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error(err)
+        }</span>
+
+        <span class="cov0" title="0">c.Start()</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package cron
+
+import (
+        "flash_sale/models"
+        "flash_sale/pkg/logging"
+        "flash_sale/pkg/redis"
+        "flash_sale/service/cache_service"
+        "time"
+)
+
+// SyncFlashSale update Flash Sale data
+func SyncFlashSale() <span class="cov0" title="0">{
+        now := time.Now()
+        var query = make(map[string]interface{})
+        query["start_time &lt;= ?"] = now
+        query["end_time &gt;= ?"] = now
+        query["stock &gt;= ?"] = 0
+        query["deleted_on = ?"] = 0
+
+        flashSales, err := models.GetFlashSales(query)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error(err)
+                return
+        }</span>
+        <span class="cov0" title="0">for _, flashSale := range flashSales </span><span class="cov0" title="0">{
+                cache := cache_service.FlashSale{}
+                cache.SetCacheFlashSale(*flashSale)
+                key := cache.GetFlashSaleKey()
+                _, err = redis.Delete(key)
+                if err != nil </span><span class="cov0" title="0">{
+                        logging.Error(err)
+                }</span>
+                <span class="cov0" title="0">data := cache.PrepareFlashSale()
+                err = redis.HMSet(key, data)
+                if err != nil </span><span class="cov0" title="0">{
+                        logging.Error(err)
+                        return
+                }</span>
+        }
+        <span class="cov0" title="0">logging.Info("[SyncFlashSale] updated Flash Sales count", len(flashSales))</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Package docs Code generated by swaggo/swag. DO NOT EDIT
+package docs
+
+import "github.com/swaggo/swag"
+
+const docTemplate = `{
+    "schemes": {{ marshal .Schemes }},
+    "swagger": "2.0",
+    "info": {
+        "description": "{{escape .Description}}",
+        "title": "{{.Title}}",
+        "contact": {},
+        "version": "{{.Version}}"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
+        "/api/v1/flash-sales": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Get flash sales",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.GetFlashSalesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Add Flash Sale",
+                "parameters": [
+                    {
+                        "description": "Add flash sale request body",
+                        "name": "add_flash_sale",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.AddFlashSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AddFlashSaleResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/flash-sales/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Get a single flash sale",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.GetFlashSaleResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Edit Flash Sale",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Flash Sale ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Edit flash sale request body",
+                        "name": "edit_flash_sale",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.EditFlashSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Delete flash sale",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/flash-sales/{id}/buy": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FlashSale"
+                ],
+                "summary": "Buy Flash Sale",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Buy flash sale request body",
+                        "name": "buy_flash_sale",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.BuyFlashSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Add product",
+                "parameters": [
+                    {
+                        "description": "Add product request body",
+                        "name": "add_product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.AddProductData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/products/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Edit product request body",
+                        "name": "edit_product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.EditProductData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get Auth",
+                "parameters": [
+                    {
+                        "description": "Auth request body",
+                        "name": "auth",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.Auth"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.AddFlashSaleRequest": {
+            "type": "object",
+            "properties": {
+                "discount_percent": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.AddFlashSaleResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.AddProductData": {
+            "type": "object",
+            "properties": {
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.Auth": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.BuyFlashSaleRequest": {
+            "type": "object",
+            "properties": {
+                "unit": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.EditFlashSaleRequest": {
+            "type": "object",
+            "properties": {
+                "discount_percent": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.EditProductData": {
+            "type": "object",
+            "properties": {
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.FlashSale": {
+            "type": "object",
+            "properties": {
+                "discount_percent": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.GetFlashSaleResponse": {
+            "type": "object",
+            "properties": {
+                "discount_percent": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.GetFlashSalesResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "flash_sales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.FlashSale"
+                    }
+                }
+            }
+        },
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "msg": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+        }
+    }
+}`
+
+// SwaggerInfo holds exported Swagger Info so clients can modify it
+var SwaggerInfo = &amp;swag.Spec{
+        Version:          "1.0",
+        Host:             "",
+        BasePath:         "",
+        Schemes:          []string{},
+        Title:            "Flash Sale",
+        Description:      "",
+        InfoInstanceName: "swagger",
+        SwaggerTemplate:  docTemplate,
+        LeftDelim:        "{{",
+        RightDelim:       "}}",
+}
+
+func init() <span class="cov0" title="0">{
+        swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package main
+
+import (
+        "context"
+        "errors"
+        "flash_sale/cron"
+        "flash_sale/models"
+        "flash_sale/pkg/logging"
+        "flash_sale/pkg/redis"
+        "flash_sale/pkg/setting"
+        "flash_sale/pkg/util"
+        "flash_sale/routers"
+        "fmt"
+        "log"
+        "net/http"
+        "os"
+        "os/signal"
+        "syscall"
+        "time"
+
+        "github.com/gin-gonic/gin"
+)
+
+func init() <span class="cov0" title="0">{
+        setting.Setup()
+        models.Setup()
+        logging.Setup()
+        redis.Setup()
+        util.Setup()
+}</span>
+
+// @title Flash Sale
+// @version 1.0
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name token
+func main() <span class="cov0" title="0">{
+        gin.SetMode(setting.ServerSetting.RunMode)
+
+        routersInit := routers.InitRouter()
+        readTimeout := setting.ServerSetting.ReadTimeout
+        writeTimeout := setting.ServerSetting.WriteTimeout
+        endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
+        maxHeaderBytes := 1 &lt;&lt; 20
+
+        server := &amp;http.Server{
+                Addr:           endPoint,
+                Handler:        routersInit,
+                ReadTimeout:    readTimeout,
+                WriteTimeout:   writeTimeout,
+                MaxHeaderBytes: maxHeaderBytes,
+        }
+
+        log.Printf("[info] start http server listening %s", endPoint)
+
+        cron.SetupCronJobs()
+
+        go func() </span><span class="cov0" title="0">{
+                if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) </span><span class="cov0" title="0">{
+                        log.Fatalf("HTTP server ListenAndServe: %v", err)
+                }</span>
+        }()
+
+        <span class="cov0" title="0">signalChan := make(chan os.Signal, 1)
+
+        signal.Notify(
+                signalChan,
+                syscall.SIGHUP,
+                syscall.SIGINT,
+                syscall.SIGQUIT,
+        )
+
+        &lt;-signalChan
+        log.Println("Server Stopped")
+
+        go func() </span><span class="cov0" title="0">{
+                &lt;-signalChan
+                log.Fatal("os.Kill - terminating...\n")
+        }</span>()
+
+        <span class="cov0" title="0">gracefullCtx, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancelShutdown()
+
+        if err := server.Shutdown(gracefullCtx); err != nil </span><span class="cov0" title="0">{
+                log.Printf("shutdown error: %v\n", err)
+                defer os.Exit(1)
+                return
+        }</span> else<span class="cov0" title="0"> {
+                log.Println("gracefully stopped")
+        }</span>
+
+        <span class="cov0" title="0">defer os.Exit(0)</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package jwt
+
+import (
+        "flash_sale/pkg/constants"
+        "flash_sale/pkg/util"
+        "net/http"
+
+        "github.com/dgrijalva/jwt-go"
+        "github.com/gin-gonic/gin"
+)
+
+// JWT is jwt middleware
+func JWT() gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                var code int
+                var data interface{}
+
+                code = constants.SUCCESS
+                token := c.GetHeader("token")
+                if token == "" </span><span class="cov0" title="0">{
+                        code = constants.INVALIDPARAMS
+                }</span> else<span class="cov0" title="0"> {
+                        claims, err := util.ParseToken(token)
+                        if err != nil </span><span class="cov0" title="0">{
+                                switch err.(*jwt.ValidationError).Errors </span>{
+                                case jwt.ValidationErrorExpired:<span class="cov0" title="0">
+                                        code = constants.ERROR_AUTH_CHECK_TOKEN_TIMEOUT</span>
+                                default:<span class="cov0" title="0">
+                                        code = constants.ERROR_AUTH_CHECK_TOKEN_FAIL</span>
+                                }
+                        } else<span class="cov0" title="0"> {
+                                c.Set("user_id", claims.UserID)
+                        }</span>
+                }
+
+                <span class="cov0" title="0">if code != constants.SUCCESS </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{
+                                "code": code,
+                                "msg":  constants.GetMsg(code),
+                                "data": data,
+                        })
+
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package models
+
+import (
+        "errors"
+        "gorm.io/gorm"
+        "strings"
+        "time"
+)
+
+type FlashSale struct {
+        Model
+
+        ProductID       uint      `gorm:"not null" json:"product_id"`
+        Product         Product   `json:"product" gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+        DiscountPercent int       `gorm:"not null;check:discount_percent &gt;= 0 AND discount_percent &lt;= 100" json:"discount_percent"`
+        Stock           uint      `gorm:"not null;check:stock &gt;= 0" json:"stock"`
+        StartTime       time.Time `gorm:"not null" json:"start_time"`
+        EndTime         time.Time `gorm:"not null" json:"end_time"`
+}
+
+// GetFlashSales gets a list of flash sales based on paging constraints
+func GetFlashSales(queryMap map[string]interface{}) ([]*FlashSale, error) <span class="cov0" title="0">{
+        var flashSale []*FlashSale
+        var conditions []string
+        var values []interface{}
+        for condition, value := range queryMap </span><span class="cov0" title="0">{
+                conditions = append(conditions, condition)
+                values = append(values, value)
+        }</span>
+        <span class="cov0" title="0">queryStr := strings.Join(conditions, " AND ")
+
+        err := db.Preload("Product").Where(queryStr, values...).Find(&amp;flashSale).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return flashSale, nil</span>
+}
+
+// GetFlashSale Get a single flashSale based on ID
+func GetFlashSale(id int) (*FlashSale, error) <span class="cov0" title="0">{
+        var flashSale FlashSale
+        err := db.Preload("Product").Where("id = ? AND deleted_on = ? ", id, 0).First(&amp;flashSale).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = db.Model(&amp;flashSale).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;flashSale, nil</span>
+}
+
+// EditFlashSale modify a single flashSale
+func EditFlashSale(id uint, data interface{}) error <span class="cov0" title="0">{
+        if err := db.Model(&amp;FlashSale{}).Where("id = ?", id).Updates(data).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// AddFlashSale add a single flashSale
+func AddFlashSale(data map[string]interface{}) (error error, flashSale *FlashSale) <span class="cov0" title="0">{
+        flashSale = &amp;FlashSale{
+                ProductID:       data["product_id"].(uint),
+                Stock:           data["stock"].(uint),
+                DiscountPercent: data["discount_percent"].(int),
+                StartTime:       data["start_time"].(time.Time),
+                EndTime:         data["end_time"].(time.Time),
+        }
+        if err := db.Create(&amp;flashSale).Error; err != nil </span><span class="cov0" title="0">{
+                return err, nil
+        }</span>
+
+        <span class="cov0" title="0">return nil, flashSale</span>
+}
+
+// DeleteFlashSale delete a single flashSale
+func DeleteFlashSale(id uint) error <span class="cov0" title="0">{
+        var data = make(map[string]interface{})
+        data["deleted_on"] = time.Now().Unix()
+
+        if err := db.Model(&amp;FlashSale{}).Where("id = ?", id).Updates(data).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package models
+
+import (
+        "flash_sale/pkg/setting"
+        "fmt"
+        "log"
+        "time"
+
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "gorm.io/gorm/schema"
+)
+
+var db *gorm.DB
+
+type Model struct {
+        ID         uint `gorm:"primary_key" json:"id"`
+        CreatedOn  int  `json:"created_on"`
+        ModifiedOn int  `json:"modified_on"`
+        DeletedOn  int  `json:"deleted_on"`
+}
+
+func Setup() <span class="cov0" title="0">{
+        var err error
+
+        dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+                setting.DatabaseSetting.Host,
+                setting.DatabaseSetting.User,
+                setting.DatabaseSetting.Password,
+                setting.DatabaseSetting.Name,
+                setting.DatabaseSetting.Port,
+        )
+
+        db, err = gorm.Open(postgres.Open(dsn), &amp;gorm.Config{
+                NamingStrategy: schema.NamingStrategy{
+                        SingularTable: false,
+                },
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("models.Setup err: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">db.Callback().Create().Before("gorm:create").Register("update_time_stamp", updateTimeStampForCreateCallback)
+        db.Callback().Update().Before("gorm:update").Register("update_time_stamp", updateTimeStampForUpdateCallback)
+        db.Callback().Delete().Before("gorm:delete").Register("delete_callback", deleteCallback)
+
+        sqlDB, err := db.DB()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("models.Setup err: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">sqlDB.SetMaxIdleConns(10)
+        sqlDB.SetMaxOpenConns(100)
+        sqlDB.SetConnMaxLifetime(time.Hour)</span>
+}
+
+func updateTimeStampForCreateCallback(db *gorm.DB) <span class="cov0" title="0">{
+        if db.Statement.Schema != nil </span><span class="cov0" title="0">{
+                now := time.Now().Unix()
+                db.Statement.SetColumn("CreatedOn", now)
+                db.Statement.SetColumn("ModifiedOn", now)
+                db.Statement.SetColumn("DeletedOn", 0)
+        }</span>
+}
+
+func updateTimeStampForUpdateCallback(db *gorm.DB) <span class="cov0" title="0">{
+        if db.Statement.Schema != nil </span><span class="cov0" title="0">{
+                now := time.Now().Unix()
+                db.Statement.SetColumn("ModifiedOn", now)
+        }</span>
+}
+
+func deleteCallback(db *gorm.DB) {<span class="cov0" title="0">}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package models
+
+import (
+        "errors"
+        "flash_sale/pkg/logging"
+        "gorm.io/gorm"
+)
+
+type Order struct {
+        Model
+
+        UserID      uint        `json:"user_id"`
+        User        User        `json:"user" gorm:"foreignKey:UserID"`
+        FlashSaleID uint        `json:"flash_sale_id"`
+        FlashSale   FlashSale   `json:"flash_sale" gorm:"foreignKey:FlashSaleID"`
+        Items       []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
+        NetPrice    float32     `json:"net_price"`
+        TotalPrice  float32     `json:"total_price"`
+}
+
+type OrderItem struct {
+        Model
+
+        OrderID         uint    `json:"order_id"`
+        Order           Order   `json:"order" gorm:"foreignKey:OrderID"`
+        ProductID       uint    `json:"product_id"`
+        Product         Product `json:"product" gorm:"foreignKey:ProductID"`
+        Quantity        uint    `json:"quantity"`
+        Price           float32 `json:"price"`
+        DiscountedPrice float32 `json:"discounted_price"`
+}
+
+// CreateOrder create order and order items
+func CreateOrder(db *gorm.DB, order Order) error <span class="cov0" title="0">{
+        err := db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                if err := tx.Create(&amp;order).Error; err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// BuyFlashSale buy new flash sale
+func BuyFlashSale(order Order) error <span class="cov0" title="0">{
+        // Transaction
+        tx := db.Begin()
+        if tx.Error != nil </span><span class="cov0" title="0">{
+                logging.Error("Transaction Error: ", tx.Error)
+        }</span>
+
+        <span class="cov0" title="0">var flashSale FlashSale
+        err := tx.Preload("Product").Where("id = ? AND deleted_on = ? ", order.FlashSaleID, 0).First(&amp;flashSale).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">var totalQuantity uint = 0
+        for _, orderItem := range order.Items </span><span class="cov0" title="0">{
+                totalQuantity += orderItem.Quantity
+        }</span>
+        <span class="cov0" title="0">flashSale.Stock -= totalQuantity
+        data := map[string]interface{}{
+                "stock": flashSale.Stock,
+        }
+        if err := tx.Model(&amp;FlashSale{}).Where("id = ?", flashSale.ID).Updates(data).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">err = CreateOrder(tx, order)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">var product Product
+        err = tx.Where("id = ? AND deleted_on = ? ", flashSale.ProductID, 0).First(&amp;product).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">data = map[string]interface{}{
+                "stock": product.Stock - int(totalQuantity),
+        }
+        err = UpdateStock(tx, flashSale.ProductID, data)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if err := tx.Commit().Error; err != nil </span><span class="cov0" title="0">{
+                logging.Error("Transaction commit error: ", err)
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package models
+
+import (
+        "errors"
+        "gorm.io/gorm"
+)
+
+type Product struct {
+        Model
+
+        Name  string  `json:"name"`
+        Stock int     `json:"stock"`
+        Price float32 `json:"price"`
+}
+
+// GetProduct Get a single product based on ID
+func GetProduct(id int) (*Product, error) <span class="cov0" title="0">{
+        var product Product
+        err := db.Where("id = ? AND deleted_on = ? ", id, 0).First(&amp;product).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = db.Model(&amp;product).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;product, nil</span>
+}
+
+// EditProduct modify a single product
+func EditProduct(id uint, data interface{}) error <span class="cov0" title="0">{
+        if err := db.Model(&amp;Product{}).Where("id = ? AND deleted_on = ? ", id, 0).Updates(data).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// AddProduct add a single product
+func AddProduct(data map[string]interface{}) error <span class="cov0" title="0">{
+        product := Product{
+                Name:  data["name"].(string),
+                Stock: data["stock"].(int),
+                Price: data["price"].(float32),
+        }
+        if err := db.Create(&amp;product).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// UpdateStock modify a single product stock
+func UpdateStock(db *gorm.DB, id uint, data interface{}) error <span class="cov0" title="0">{
+        err := db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                if err := db.Model(&amp;Product{}).Where("id = ? AND deleted_on = ? ", id, 0).Updates(data).Error; err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// DeleteProduct delete a single PRODUCT
+func DeleteProduct(id int) error <span class="cov0" title="0">{
+        if err := db.Where("id = ?", id).Delete(Product{}).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package models
+
+import (
+        "errors"
+        "flash_sale/pkg/logging"
+        "gorm.io/gorm"
+)
+
+type User struct {
+        Model
+
+        Username string `json:"username"`
+        Password string `json:"password"`
+}
+
+// CheckAuth checks if authentication information exists
+func CheckAuth(username, password string) (bool, error) <span class="cov0" title="0">{
+        var user User
+        err := db.Select("id").Where(User{Username: username, Password: password}).First(&amp;user).Error
+        if err != nil &amp;&amp; !errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                logging.Error("[CheckAuth]User not found")
+                return false, err
+        }</span>
+
+        <span class="cov0" title="0">if user.ID &gt; 0 </span><span class="cov0" title="0">{
+                return true, nil
+        }</span>
+
+        <span class="cov0" title="0">return false, nil</span>
+}
+
+// GetUserID get UserID via username
+func GetUserID(username string) (uint, error) <span class="cov0" title="0">{
+        var user User
+        err := db.Select("id").Where(User{Username: username}).First(&amp;user).Error
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error("[GetUserID]User not found")
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return user.ID, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package app
+
+import (
+        "flash_sale/pkg/constants"
+        "github.com/astaxie/beego/validation"
+        "github.com/gin-gonic/gin"
+        "net/http"
+)
+
+// BindAndValid binds and validates data
+func BindAndValid(c *gin.Context, data interface{}) (int, int) <span class="cov0" title="0">{
+        err := c.Bind(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return http.StatusBadRequest, constants.INVALIDPARAMS
+        }</span>
+
+        <span class="cov0" title="0">valid := validation.Validation{}
+        check, err := valid.Valid(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return http.StatusInternalServerError, constants.ERROR
+        }</span>
+        <span class="cov0" title="0">if !check </span><span class="cov0" title="0">{
+                MarkErrors(valid.Errors)
+                return http.StatusBadRequest, constants.INVALIDPARAMS
+        }</span>
+
+        <span class="cov0" title="0">return http.StatusOK, constants.SUCCESS</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package app
+
+import (
+        "flash_sale/pkg/logging"
+        "github.com/astaxie/beego/validation"
+        "time"
+)
+
+// MarkErrors logs error logs
+func MarkErrors(errors []*validation.Error) <span class="cov0" title="0">{
+        for _, err := range errors </span><span class="cov0" title="0">{
+                logging.Info(err.Key, err.Message)
+        }</span>
+
+        <span class="cov0" title="0">return</span>
+}
+
+type Auth struct {
+        Username string `json:"username" valid:"Required; MaxSize(50)"`
+        Password string `json:"password" valid:"Required; MaxSize(50)"`
+}
+type AddProductData struct {
+        Name     string  `json:"name" valid:"Required;MaxSize(100)"`
+        Stock    int     `json:"stock" valid:"Required;Min(1)"`
+        Price    float32 `json:"price" valid:"Required"`
+        IsActive bool    `json:"is_active" valid:"Required"`
+}
+
+type EditProductData struct {
+        Name     string `json:"name" valid:"Required;MaxSize(100)"`
+        Stock    int    `json:"stock" valid:"Min(0)"`
+        IsActive bool   `json:"is_active" valid:"Required"`
+}
+
+type AddFlashSaleRequest struct {
+        ProductID       uint      `json:"product_id"`
+        DiscountPercent int       `json:"discount_percent"`
+        Stock           int       `json:"stock"`
+        StartTime       time.Time `json:"start_time"`
+        EndTime         time.Time `json:"end_time"`
+}
+
+type AddFlashSaleResponse struct {
+        ID uint `json:"id"`
+}
+type FlashSale struct {
+        ID              uint `json:"id"`
+        ProductID       uint `json:"product_id"`
+        DiscountPercent int  `json:"discount_percent"`
+        Stock           int  `json:"stock"`
+}
+
+type GetFlashSalesResponse struct {
+        FlashSales []FlashSale `json:"flash_sales"`
+        Count      int         `json:"count"`
+}
+
+type EditFlashSaleRequest struct {
+        DiscountPercent int       `json:"discount_percent"`
+        Stock           int       `json:"stock"`
+        StartTime       time.Time `json:"start_time"`
+        EndTime         time.Time `json:"end_time"`
+}
+
+type BuyFlashSaleRequest struct {
+        Unit uint `json:"unit"`
+}
+
+type GetFlashSaleResponse struct {
+        FlashSale
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package app
+
+import (
+        "flash_sale/pkg/constants"
+        "github.com/gin-gonic/gin"
+)
+
+type Gin struct {
+        C *gin.Context
+}
+
+type Response struct {
+        Code int         `json:"code"`
+        Msg  string      `json:"msg"`
+        Data interface{} `json:"data"`
+}
+
+// Response setting gin.JSON
+func (g *Gin) Response(httpCode, errCode int, data interface{}) <span class="cov0" title="0">{
+        g.C.JSON(httpCode, Response{
+                Code: errCode,
+                Msg:  constants.GetMsg(errCode),
+                Data: data,
+        })
+        return
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package constants
+
+var MsgFlags = map[int]string{
+        SUCCESS:       "ok",
+        ERROR:         "fail",
+        INVALIDPARAMS: "invalid",
+}
+
+// GetMsg get error information based on Code
+func GetMsg(code int) string <span class="cov0" title="0">{
+        msg, ok := MsgFlags[code]
+        if ok </span><span class="cov0" title="0">{
+                return msg
+        }</span>
+
+        <span class="cov0" title="0">return MsgFlags[ERROR]</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package file
+
+import (
+        "fmt"
+        "os"
+)
+
+// CheckNotExist check if the file exists
+func CheckNotExist(src string) bool <span class="cov0" title="0">{
+        _, err := os.Stat(src)
+
+        return os.IsNotExist(err)
+}</span>
+
+// CheckPermission check if the file has permission
+func CheckPermission(src string) bool <span class="cov0" title="0">{
+        _, err := os.Stat(src)
+
+        return os.IsPermission(err)
+}</span>
+
+// IsNotExistMkDir create a directory if it does not exist
+func IsNotExistMkDir(src string) error <span class="cov0" title="0">{
+        if notExist := CheckNotExist(src); notExist == true </span><span class="cov0" title="0">{
+                if err := MkDir(src); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// MkDir create a directory
+func MkDir(src string) error <span class="cov0" title="0">{
+        err := os.MkdirAll(src, os.ModePerm)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// Open a file according to a specific mode
+func Open(name string, flag int, perm os.FileMode) (*os.File, error) <span class="cov0" title="0">{
+        f, err := os.OpenFile(name, flag, perm)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return f, nil</span>
+}
+
+// MustOpen maximize trying to open the file
+func MustOpen(fileName, filePath string) (*os.File, error) <span class="cov0" title="0">{
+        dir, err := os.Getwd()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("os.Getwd err: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">src := dir + "/" + filePath
+        perm := CheckPermission(src)
+        if perm == true </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("file.CheckPermission Permission denied src: %s", src)
+        }</span>
+
+        <span class="cov0" title="0">err = IsNotExistMkDir(src)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("file.IsNotExistMkDir src: %s, err: %v", src, err)
+        }</span>
+
+        <span class="cov0" title="0">f, err := Open(src+fileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("Fail to OpenFile :%v", err)
+        }</span>
+
+        <span class="cov0" title="0">return f, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package logging
+
+import (
+        "flash_sale/pkg/setting"
+        "fmt"
+        "time"
+)
+
+// getLogFilePath get the log file save path
+func getLogFilePath() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%s%s", setting.AppSetting.RuntimeRootPath, setting.AppSetting.LogSavePath)
+}</span>
+
+// getLogFileName get the save name of the log file
+func getLogFileName() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%s%s.%s",
+                setting.AppSetting.LogSaveName,
+                time.Now().Format(setting.AppSetting.TimeFormat),
+                setting.AppSetting.LogFileExt,
+        )
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package logging
+
+import (
+        "flash_sale/pkg/file"
+        "fmt"
+        "log"
+        "os"
+        "path/filepath"
+        "runtime"
+)
+
+type Level int
+
+var (
+        F *os.File
+
+        DefaultPrefix      = ""
+        DefaultCallerDepth = 2
+
+        logger     *log.Logger
+        logPrefix  = ""
+        levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+)
+
+const (
+        DEBUG Level = iota
+        INFO
+        WARNING
+        ERROR
+        FATAL
+)
+
+// Setup initialize the log instance
+func Setup() <span class="cov0" title="0">{
+        var err error
+        filePath := getLogFilePath()
+        fileName := getLogFileName()
+
+        F, err = file.MustOpen(fileName, filePath)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("logging.Setup err: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">logger = log.New(F, DefaultPrefix, log.LstdFlags)</span>
+}
+
+// Debug output logs at debug level
+func Debug(v ...interface{}) <span class="cov0" title="0">{
+        setPrefix(DEBUG)
+        logger.Println(v...)
+}</span>
+
+// Info output logs at info level
+func Info(v ...interface{}) <span class="cov0" title="0">{
+        setPrefix(INFO)
+        logger.Println(v...)
+}</span>
+
+// Warn output logs at warn level
+func Warn(v ...interface{}) <span class="cov0" title="0">{
+        setPrefix(WARNING)
+        logger.Println(v...)
+}</span>
+
+// Error output logs at error level
+func Error(v ...interface{}) <span class="cov0" title="0">{
+        setPrefix(ERROR)
+        logger.Println(v...)
+}</span>
+
+// Fatal output logs at fatal level
+func Fatal(v ...interface{}) <span class="cov0" title="0">{
+        setPrefix(FATAL)
+        logger.Fatalln(v...)
+}</span>
+
+// setPrefix set the prefix of the log output
+func setPrefix(level Level) <span class="cov0" title="0">{
+        _, file, line, ok := runtime.Caller(DefaultCallerDepth)
+        if ok </span><span class="cov0" title="0">{
+                logPrefix = fmt.Sprintf("[%s][%s:%d]", levelFlags[level], filepath.Base(file), line)
+        }</span> else<span class="cov0" title="0"> {
+                logPrefix = fmt.Sprintf("[%s]", levelFlags[level])
+        }</span>
+
+        <span class="cov0" title="0">logger.SetPrefix(logPrefix)</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package redis
+
+import (
+        "flash_sale/pkg/setting"
+        "strconv"
+        "time"
+
+        "github.com/gomodule/redigo/redis"
+)
+
+var RedisConn *redis.Pool
+
+// Setup Initialize the Redis instance
+func Setup() error <span class="cov0" title="0">{
+        RedisConn = &amp;redis.Pool{
+                MaxIdle:     setting.RedisSetting.MaxIdle,
+                MaxActive:   setting.RedisSetting.MaxActive,
+                IdleTimeout: setting.RedisSetting.IdleTimeout,
+                Dial: func() (redis.Conn, error) </span><span class="cov0" title="0">{
+                        c, err := redis.Dial("tcp", setting.RedisSetting.Host)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return nil, err
+                        }</span>
+                        <span class="cov0" title="0">if setting.RedisSetting.Password != "" </span><span class="cov0" title="0">{
+                                if _, err := c.Do("AUTH", setting.RedisSetting.Password); err != nil </span><span class="cov0" title="0">{
+                                        c.Close()
+                                        return nil, err
+                                }</span>
+                        }
+                        <span class="cov0" title="0">return c, err</span>
+                },
+                TestOnBorrow: func(c redis.Conn, t time.Time) error <span class="cov0" title="0">{
+                        _, err := c.Do("PING")
+                        return err
+                }</span>,
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// Exists check a key
+func Exists(key string) bool <span class="cov0" title="0">{
+        conn := RedisConn.Get()
+        defer conn.Close()
+
+        exists, err := redis.Bool(conn.Do("EXISTS", key))
+        if err != nil </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov0" title="0">return exists</span>
+}
+
+// Get search a key
+func Get(key string) (map[string]interface{}, error) <span class="cov0" title="0">{
+        conn := RedisConn.Get()
+        defer conn.Close()
+
+        flashSale, err := GetFlashSaleData(conn, key)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return flashSale, nil</span>
+}
+
+// HGETALL search keys
+func HGetAll(pattern string) ([]interface{}, error) <span class="cov0" title="0">{
+        conn := RedisConn.Get()
+        defer conn.Close()
+        var cursor int64 = 0
+        var keys []string
+        scanValues, err := redis.Values(conn.Do("SCAN", cursor, "MATCH", pattern, "COUNT", 10))
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">scanValues, err = redis.Scan(scanValues, &amp;cursor, &amp;keys)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">result := make([]interface{}, len(keys))
+        for i, key := range keys </span><span class="cov0" title="0">{
+                flashSale := make(map[string]interface{})
+                flashSale, err = GetFlashSaleData(conn, key)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">result[i] = flashSale</span>
+        }
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+// Delete delete a kye
+func Delete(key string) (bool, error) <span class="cov0" title="0">{
+        conn := RedisConn.Get()
+        defer conn.Close()
+
+        return redis.Bool(conn.Do("DEL", key))
+}</span>
+
+// HMSet set key
+func HMSet(key string, data map[string]interface{}) error <span class="cov0" title="0">{
+        conn := RedisConn.Get()
+        defer conn.Close()
+
+        args := make([]interface{}, 0, len(data)*2+1)
+        args = append(args, key)
+
+        for field, value := range data </span><span class="cov0" title="0">{
+                args = append(args, field, value)
+        }</span>
+
+        <span class="cov0" title="0">_, err := conn.Do("HMSET", args...)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// GetFlashSaleData set key
+func GetFlashSaleData(conn redis.Conn, key string) (map[string]interface{}, error) <span class="cov0" title="0">{
+        values, err := redis.Values(conn.Do("HGETALL", key))
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">flashSale := make(map[string]interface{})
+        for j := 0; j &lt; len(values); j += 2 </span><span class="cov0" title="0">{
+                field := string(values[j].([]byte))
+                valueStr := string(values[j+1].([]byte))
+
+                if field == "id" || field == "product_id" || field == "stock" || field == "discount_percent" </span><span class="cov0" title="0">{
+                        valueInt, err := strconv.Atoi(valueStr)
+                        if err != nil </span><span class="cov0" title="0">{
+                                flashSale[field] = valueStr
+                        }</span> else<span class="cov0" title="0"> {
+                                flashSale[field] = valueInt
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        flashSale[field] = valueStr
+                }</span>
+        }
+        <span class="cov0" title="0">return flashSale, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package setting
+
+import (
+        "log"
+        "time"
+
+        "github.com/go-ini/ini"
+)
+
+type App struct {
+        JwtSecret string
+        PageSize  int
+        PrefixUrl string
+
+        RuntimeRootPath string
+
+        LogSavePath string
+        LogSaveName string
+        LogFileExt  string
+        TimeFormat  string
+}
+
+var AppSetting = &amp;App{}
+
+type Server struct {
+        RunMode      string
+        HttpPort     int
+        ReadTimeout  time.Duration
+        WriteTimeout time.Duration
+}
+
+var ServerSetting = &amp;Server{}
+
+type Database struct {
+        Type     string
+        User     string
+        Password string
+        Host     string
+        Name     string
+        Port     string
+}
+
+var DatabaseSetting = &amp;Database{}
+
+type Redis struct {
+        Host        string
+        Password    string
+        MaxIdle     int
+        MaxActive   int
+        IdleTimeout time.Duration
+}
+
+var RedisSetting = &amp;Redis{}
+
+var cfg *ini.File
+
+// Setup initialize the configuration instance
+func Setup() <span class="cov0" title="0">{
+        var err error
+        cfg, err = ini.Load("conf/app.ini")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("setting.Setup, fail to parse 'conf/app.ini': %v", err)
+        }</span>
+
+        <span class="cov0" title="0">mapTo("app", AppSetting)
+        mapTo("server", ServerSetting)
+        mapTo("database", DatabaseSetting)
+        mapTo("redis", RedisSetting)
+
+        ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
+        ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second
+        RedisSetting.IdleTimeout = RedisSetting.IdleTimeout * time.Second</span>
+}
+
+// mapTo map section
+func mapTo(section string, v interface{}) <span class="cov0" title="0">{
+        err := cfg.Section(section).MapTo(v)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Cfg.MapTo %s err: %v", section, err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package util
+
+import (
+        "time"
+
+        "github.com/dgrijalva/jwt-go"
+)
+
+var jwtSecret []byte
+
+type Claims struct {
+        Username string `json:"username"`
+        Password string `json:"password"`
+        UserID   uint   `json:"user_id"`
+        jwt.StandardClaims
+}
+
+// GenerateToken generate tokens used for auth
+func GenerateToken(username, password string, userID uint) (string, error) <span class="cov0" title="0">{
+        nowTime := time.Now()
+        expireTime := nowTime.Add(3 * time.Hour)
+
+        claims := Claims{
+                EncodeMD5(username),
+                EncodeMD5(password),
+                userID,
+                jwt.StandardClaims{
+                        ExpiresAt: expireTime.Unix(),
+                        Issuer:    "gin-blog",
+                },
+        }
+
+        tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        token, err := tokenClaims.SignedString(jwtSecret)
+
+        return token, err
+}</span>
+
+// ParseToken parsing token
+func ParseToken(token string) (*Claims, error) <span class="cov0" title="0">{
+        tokenClaims, err := jwt.ParseWithClaims(token, &amp;Claims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                return jwtSecret, nil
+        }</span>)
+
+        <span class="cov0" title="0">if tokenClaims != nil </span><span class="cov0" title="0">{
+                if claims, ok := tokenClaims.Claims.(*Claims); ok &amp;&amp; tokenClaims.Valid </span><span class="cov0" title="0">{
+                        return claims, nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil, err</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package util
+
+import (
+        "crypto/md5"
+        "encoding/hex"
+)
+
+// EncodeMD5 md5 encryption
+func EncodeMD5(value string) string <span class="cov0" title="0">{
+        m := md5.New()
+        m.Write([]byte(value))
+
+        return hex.EncodeToString(m.Sum(nil))
+}</span>
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package util
+
+import "flash_sale/pkg/setting"
+
+// Setup Initialize the util
+func Setup() <span class="cov0" title="0">{
+        jwtSecret = []byte(setting.AppSetting.JwtSecret)
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package api
+
+import (
+        "flash_sale/pkg/app"
+        "flash_sale/pkg/constants"
+        "flash_sale/pkg/util"
+        "flash_sale/service/auth_service"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+// @Summary Get Auth
+// @Produce  json
+// @Tags Auth
+// @Param auth body app.Auth true "Auth request body"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /auth [post]
+func GetAuth(c *gin.Context) <span class="cov0" title="0">{
+        var (
+                appG = app.Gin{C: c}
+                data app.Auth
+        )
+
+        httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">authService := auth_service.Auth{Username: data.Username, Password: data.Password}
+        isExist, err := authService.Check()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_AUTH_CHECK_TOKEN_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if !isExist </span><span class="cov0" title="0">{
+                appG.Response(http.StatusUnauthorized, constants.ERROR_AUTH, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">userID, err := authService.GetUserID()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_AUTH_CHECK_TOKEN_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">token, err := util.GenerateToken(data.Username, data.Password, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_AUTH_TOKEN, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, map[string]string{
+                "token": token,
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package v1
+
+import (
+        "encoding/json"
+        "flash_sale/pkg/app"
+        "flash_sale/pkg/constants"
+        "flash_sale/service/flash_sale_service"
+        "github.com/astaxie/beego/validation"
+        "github.com/gin-gonic/gin"
+        "github.com/unknwon/com"
+        "net/http"
+)
+
+// @Summary Add Flash Sale
+// @Tags FlashSale
+// @Produce  json
+// @Param add_flash_sale body app.AddFlashSaleRequest true "Add flash sale request body"
+// @Security BearerAuth
+// @Success 200 {object} app.AddFlashSaleResponse
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales [post]
+func AddFlashSale(c *gin.Context) <span class="cov0" title="0">{
+        var (
+                appG = app.Gin{C: c}
+                data app.AddFlashSaleRequest
+        )
+
+        httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">flashSaleService := flash_sale_service.FlashSale{
+                ProductID:       data.ProductID,
+                DiscountPercent: data.DiscountPercent,
+                Stock:           data.Stock,
+                StartTime:       data.StartTime,
+                EndTime:         data.EndTime,
+        }
+        err, flashSaleID := flashSaleService.Add()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_ADD_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, app.AddFlashSaleResponse{ID: flashSaleID})</span>
+}
+
+// @Summary Get flash sales
+// @Tags FlashSale
+// @Produce  json
+// @Security BearerAuth
+// @Success 200 {object} app.GetFlashSalesResponse
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales [get]
+func GetFlashSales(c *gin.Context) <span class="cov0" title="0">{
+        appG := app.Gin{C: c}
+
+        flashSaleService := flash_sale_service.FlashSale{}
+
+        flashSales, err := flashSaleService.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALES_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">data, err := json.Marshal(flashSales)
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALES_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var response []app.FlashSale
+        err = json.Unmarshal(data, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALES_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">result := app.GetFlashSalesResponse{
+                Count:      len(response),
+                FlashSales: response,
+        }
+
+        appG.Response(http.StatusOK, constants.SUCCESS, result)</span>
+}
+
+// @Summary Buy Flash Sale
+// @Tags FlashSale
+// @Produce  json
+// @Security BearerAuth
+// @Param id path int true "ID"
+// @Param buy_flash_sale body app.BuyFlashSaleRequest true "Buy flash sale request body"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales/{id}/buy [post]
+func BuyFlashSale(c *gin.Context) <span class="cov0" title="0">{
+        appG := app.Gin{C: c}
+        userIDValue, _ := c.Get("user_id")
+        data := app.BuyFlashSaleRequest{}
+        id := com.StrTo(c.Param("id")).MustInt()
+        valid := validation.Validation{}
+        valid.Min(id, 1, "id").Message(constants.GetMsg(constants.INVALIDPARAMS))
+
+        if valid.HasErrors() </span><span class="cov0" title="0">{
+                app.MarkErrors(valid.Errors)
+                appG.Response(http.StatusBadRequest, constants.INVALIDPARAMS, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">userID, _ := userIDValue.(uint)
+        flashSaleService := flash_sale_service.FlashSale{ID: uint(id), Unit: data.Unit, UserID: userID}
+        flashSale, err := flashSaleService.Get()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">if flashSale.Stock &lt; data.Unit </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_INSUFFICIENT_STOCK, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">err = flashSaleService.Buy()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_BUY_FAIL, err.Error())
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, nil)</span>
+}
+
+// @Summary Get a single flash sale
+// @Tags FlashSale
+// @Produce  json
+// @Security BearerAuth
+// @Param id path int true "ID"
+// @Success 200 {object} app.GetFlashSaleResponse
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales/{id} [get]
+func GetFlashSale(c *gin.Context) <span class="cov0" title="0">{
+        appG := app.Gin{C: c}
+        id := com.StrTo(c.Param("id")).MustInt()
+        valid := validation.Validation{}
+        valid.Min(id, 1, "id").Message(constants.GetMsg(constants.INVALIDPARAMS))
+
+        if valid.HasErrors() </span><span class="cov0" title="0">{
+                app.MarkErrors(valid.Errors)
+                appG.Response(http.StatusBadRequest, constants.INVALIDPARAMS, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">flashSaleService := flash_sale_service.FlashSale{ID: uint(id)}
+        exists, err := flashSaleService.ExistByID()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">if !exists </span><span class="cov0" title="0">{
+                appG.Response(http.StatusOK, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">flashSale, err := flashSaleService.Get()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">data, err := json.Marshal(flashSale)
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.INTERNAL_ERROR, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var response app.FlashSale
+        err = json.Unmarshal(data, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.INTERNAL_ERROR, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, response)</span>
+}
+
+// @Summary Edit Flash Sale
+// @Tags FlashSale
+// @Produce  json
+// @Security BearerAuth
+// @Param id path int true "Flash Sale ID"
+// @Param edit_flash_sale body app.EditFlashSaleRequest true "Edit flash sale request body"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales/{id} [put]
+func EditFlashSale(c *gin.Context) <span class="cov0" title="0">{
+        var (
+                appG = app.Gin{C: c}
+                data app.EditFlashSaleRequest
+        )
+
+        httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">flashSaleService := flash_sale_service.FlashSale{
+                ID:              uint(com.StrTo(c.Param("id")).MustInt()),
+                Stock:           data.Stock,
+                DiscountPercent: data.DiscountPercent,
+                StartTime:       data.StartTime,
+                EndTime:         data.EndTime,
+        }
+
+        err := flashSaleService.Edit()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_EDIT_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, nil)</span>
+}
+
+// @Summary Delete flash sale
+// @Tags FlashSale
+// @Produce  json
+// @Security BearerAuth
+// @Param id path int true "ID"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/flash-sales/{id} [delete]
+func DeleteFlashSale(c *gin.Context) <span class="cov0" title="0">{
+        appG := app.Gin{C: c}
+        id := com.StrTo(c.Param("id")).MustInt()
+        valid := validation.Validation{}
+        valid.Min(id, 1, "id").Message(constants.GetMsg(constants.INVALIDPARAMS))
+
+        if valid.HasErrors() </span><span class="cov0" title="0">{
+                app.MarkErrors(valid.Errors)
+                appG.Response(http.StatusOK, constants.INVALIDPARAMS, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">flashSaleService := flash_sale_service.FlashSale{ID: uint(id)}
+        exists, err := flashSaleService.ExistByID()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+        <span class="cov0" title="0">if !exists </span><span class="cov0" title="0">{
+                appG.Response(http.StatusOK, constants.ERROR_GET_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">err = flashSaleService.Delete()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_DELETE_FLASH_SALE_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, nil)</span>
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package v1
+
+import (
+        "flash_sale/pkg/app"
+        "flash_sale/pkg/constants"
+        "flash_sale/service/product_service"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "github.com/unknwon/com"
+)
+
+// @Summary Add product
+// @Tags Product
+// @Produce  json
+// @Param add_product body app.AddProductData true "Add product request body"
+// @Security BearerAuth
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/products [post]
+func AddProduct(c *gin.Context) <span class="cov0" title="0">{
+        var (
+                appG = app.Gin{C: c}
+                data app.AddProductData
+        )
+
+        httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">productService := product_service.Product{
+                Name:     data.Name,
+                Stock:    data.Stock,
+                IsActive: data.IsActive,
+                Price:    data.Price,
+        }
+        if err := productService.Add(); err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_ADD_PRODUCT_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, nil)</span>
+}
+
+// @Summary Update product
+// @Produce  json
+// @Tags Product
+// @Param id path int true "Product ID"
+// @Param edit_product body app.EditProductData true "Edit product request body"
+// @Security BearerAuth
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /api/v1/products/{id} [put]
+func EditProduct(c *gin.Context) <span class="cov0" title="0">{
+        var (
+                appG = app.Gin{C: c}
+                data app.EditProductData
+        )
+
+        httpCode, errCode := app.BindAndValid(c, &amp;data)
+        if errCode != constants.SUCCESS </span><span class="cov0" title="0">{
+                appG.Response(httpCode, errCode, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">productService := product_service.Product{
+                ID:       uint(com.StrTo(c.Param("id")).MustInt()),
+                Name:     data.Name,
+                Stock:    data.Stock,
+                IsActive: data.IsActive,
+        }
+
+        err := productService.Edit()
+        if err != nil </span><span class="cov0" title="0">{
+                appG.Response(http.StatusInternalServerError, constants.ERROR_EDIT_PRODUCT_FAIL, nil)
+                return
+        }</span>
+
+        <span class="cov0" title="0">appG.Response(http.StatusOK, constants.SUCCESS, nil)</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package routers
+
+import (
+        "flash_sale/docs"
+        "flash_sale/middleware/jwt"
+        "flash_sale/routers/api"
+        v1 "flash_sale/routers/api/v1"
+        "github.com/gin-gonic/gin"
+
+        "github.com/swaggo/gin-swagger"
+        "github.com/swaggo/gin-swagger/swaggerFiles"
+)
+
+// InitRouter initialize routing information
+func InitRouter() *gin.Engine <span class="cov0" title="0">{
+        // programmatically set swagger info
+        docs.SwaggerInfo.Title = "Flash Sale"
+        docs.SwaggerInfo.Description = "Flash Sale Swagger"
+        docs.SwaggerInfo.Version = "1.0"
+        docs.SwaggerInfo.Host = "localhost:8000"
+        docs.SwaggerInfo.BasePath = ""
+        docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
+        r := gin.New()
+
+        r.Use(gin.Logger())
+        r.Use(gin.Recovery())
+
+        r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+        r.POST("/auth", api.GetAuth)
+
+        apiv1 := r.Group("/api/v1")
+        apiv1.Use(jwt.JWT())
+        </span><span class="cov0" title="0">{
+                apiv1.POST("/products", v1.AddProduct)
+                apiv1.PUT("/products/:id", v1.EditProduct)
+
+                apiv1.POST("/flash-sales", v1.AddFlashSale)
+                apiv1.GET("/flash-sales", v1.GetFlashSales)
+                apiv1.POST("/flash-sales/:id/buy", v1.BuyFlashSale)
+                apiv1.GET("/flash-sales/:id", v1.GetFlashSale)
+                apiv1.PUT("/flash-sales/:id", v1.EditFlashSale)
+                apiv1.DELETE("/flash-sales/:id", v1.DeleteFlashSale)
+        }</span>
+
+        <span class="cov0" title="0">return r</span>
+}
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package auth_service
+
+import "flash_sale/models"
+
+type Auth struct {
+        Username string
+        Password string
+        UserID   uint
+}
+
+func (a *Auth) Check() (bool, error) <span class="cov0" title="0">{
+        return models.CheckAuth(a.Username, a.Password)
+}</span>
+
+func (a *Auth) GetUserID() (uint, error) <span class="cov0" title="0">{
+        return models.GetUserID(a.Username)
+}</span>
+</pre>
+		
+		<pre class="file" id="file27" style="display: none">package cache_service
+
+import (
+        "flash_sale/models"
+        "flash_sale/pkg/constants"
+        "strconv"
+        "strings"
+)
+
+type FlashSale struct {
+        ID              int  `json:"id"`
+        ProductID       int  `json:"product_id"`
+        DiscountPercent int  `json:"discount_percent"`
+        Stock           uint `json:"stock"`
+}
+
+func (f *FlashSale) GetFlashSaleKey() string <span class="cov0" title="0">{
+        return constants.CACHE_FLASH_SALE + "_" + strconv.Itoa(int(f.ID))
+}</span>
+
+func (f *FlashSale) GetFlashSalesKey() string <span class="cov0" title="0">{
+        keys := []string{
+                constants.CACHE_FLASH_SALE,
+        }
+
+        if f.ID &gt; 0 </span><span class="cov0" title="0">{
+                keys = append(keys, strconv.Itoa(int(f.ID)))
+        }</span> else<span class="cov0" title="0"> {
+                keys = append(keys, "*")
+        }</span>
+
+        <span class="cov0" title="0">return strings.Join(keys, "_")</span>
+}
+
+func (f *FlashSale) SetCacheFlashSale(flashSale models.FlashSale) <span class="cov0" title="0">{
+        f.ID = int(flashSale.ID)
+        f.ProductID = int(flashSale.ProductID)
+        f.DiscountPercent = flashSale.DiscountPercent
+        f.Stock = flashSale.Stock
+}</span>
+
+func (f *FlashSale) PrepareFlashSale() map[string]interface{} <span class="cov0" title="0">{
+        return map[string]interface{}{
+                "id":               f.ID,
+                "product_id":       f.ProductID,
+                "discount_percent": f.DiscountPercent,
+                "stock":            f.Stock,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file28" style="display: none">package flash_sale_service
+
+import (
+        "encoding/json"
+        "flash_sale/models"
+        "flash_sale/pkg/logging"
+        "flash_sale/pkg/redis"
+        "flash_sale/service/cache_service"
+        "time"
+)
+
+type FlashSale struct {
+        ID              uint      `json:"id"`
+        ProductID       uint      `json:"product_id"`
+        DiscountPercent int       `json:"discount_percent"`
+        Stock           int       `json:"stock"`
+        StartTime       time.Time `json:"start_time"`
+        EndTime         time.Time `json:"end_time"`
+        Unit            uint      `json:"unit"`
+        UserID          uint      `json:"user_id"`
+}
+
+func (f *FlashSale) Add() (error, uint) <span class="cov0" title="0">{
+        flashSaleData := map[string]interface{}{
+                "product_id":       f.ProductID,
+                "discount_percent": f.DiscountPercent,
+                "stock":            f.Stock,
+                "start_time":       f.StartTime,
+                "end_time":         f.EndTime,
+        }
+        err, flashSale := models.AddFlashSale(flashSaleData)
+        if err != nil </span><span class="cov0" title="0">{
+                return err, 0
+        }</span>
+
+        // update cache
+        <span class="cov0" title="0">cache := cache_service.FlashSale{ID: int(flashSale.ID)}
+        key := cache.GetFlashSaleKey()
+        cache.SetCacheFlashSale(*flashSale)
+        data := cache.PrepareFlashSale()
+        err = redis.HMSet(key, data)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error(err)
+                return nil, flashSale.ID
+        }</span>
+        <span class="cov0" title="0">return nil, flashSale.ID</span>
+}
+
+func (f *FlashSale) Edit() error <span class="cov0" title="0">{
+        err := models.EditFlashSale(f.ID, map[string]interface{}{
+                "stock":            f.Stock,
+                "discount_percent": f.DiscountPercent,
+                "start_time":       f.StartTime,
+                "end_time":         f.EndTime,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // update cache
+        <span class="cov0" title="0">flashSale, err := models.GetFlashSale(int(f.ID))
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">cache := cache_service.FlashSale{}
+        cache.SetCacheFlashSale(*flashSale)
+        key := cache.GetFlashSalesKey()
+        data := cache.PrepareFlashSale()
+        err = redis.HMSet(key, data)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error(err)
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (f *FlashSale) Get() (*models.FlashSale, error) <span class="cov0" title="0">{
+        var cacheFlashSale *models.FlashSale
+
+        // update cache
+        cache := cache_service.FlashSale{ID: int(f.ID)}
+        key := cache.GetFlashSaleKey()
+        if redis.Exists(key) </span><span class="cov0" title="0">{
+                data, err := redis.Get(key)
+                if err != nil </span><span class="cov0" title="0">{
+                        logging.Info(err)
+                        return nil, err
+                }</span> else<span class="cov0" title="0"> {
+                        jsonData, _ := json.Marshal(data)
+                        err = json.Unmarshal(jsonData, &amp;cacheFlashSale)
+                        if err != nil </span><span class="cov0" title="0">{
+                                logging.Info(err)
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">return cacheFlashSale, nil</span>
+}
+
+func (f *FlashSale) GetAll() ([]*models.FlashSale, error) <span class="cov0" title="0">{
+        var flashSales []*models.FlashSale
+
+        // update cache
+        cache := cache_service.FlashSale{}
+        key := cache.GetFlashSalesKey()
+        data, err := redis.HGetAll(key)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Info(err)
+        }</span> else<span class="cov0" title="0"> {
+                jsonData, _ := json.Marshal(data)
+                err = json.Unmarshal(jsonData, &amp;flashSales)
+                if err != nil </span><span class="cov0" title="0">{
+                        logging.Info(err)
+                }</span>
+        }
+        <span class="cov0" title="0">return flashSales, nil</span>
+}
+
+func (f *FlashSale) Delete() error <span class="cov0" title="0">{
+        // update cache
+        cache := cache_service.FlashSale{ID: int(f.ID)}
+        key := cache.GetFlashSaleKey()
+        if redis.Exists(key) </span><span class="cov0" title="0">{
+                _, err := redis.Delete(key)
+                if err != nil </span><span class="cov0" title="0">{
+                        logging.Info(err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return models.DeleteFlashSale(f.ID)</span>
+}
+
+func (f *FlashSale) Buy() error <span class="cov0" title="0">{
+        flashSale, err := models.GetFlashSale(int(f.ID))
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Info(err)
+                return err
+        }</span>
+        <span class="cov0" title="0">flashSale.Stock -= f.Unit
+        discountAmount := flashSale.Product.Price * float32(flashSale.DiscountPercent) / 100
+        discountedPrice := flashSale.Product.Price - discountAmount
+        order := models.Order{
+                UserID:      f.UserID,
+                FlashSaleID: flashSale.ID,
+                NetPrice:    discountedPrice * float32(f.Unit),
+                TotalPrice:  flashSale.Product.Price * float32(f.Unit),
+                Items: []models.OrderItem{
+                        {
+                                ProductID:       flashSale.ProductID,
+                                Quantity:        f.Unit,
+                                Price:           flashSale.Product.Price,
+                                DiscountedPrice: discountedPrice,
+                        },
+                },
+        }
+
+        err = models.BuyFlashSale(order)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Info(err)
+                return err
+        }</span>
+
+        // update cache
+        <span class="cov0" title="0">cache := cache_service.FlashSale{}
+        cache.SetCacheFlashSale(*flashSale)
+        key := cache.GetFlashSalesKey()
+        data := cache.PrepareFlashSale()
+        err = redis.HMSet(key, data)
+        if err != nil </span><span class="cov0" title="0">{
+                logging.Error(err)
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (f *FlashSale) ExistByID() (bool, error) <span class="cov0" title="0">{
+        // update cache
+        cache := cache_service.FlashSale{ID: int(f.ID)}
+        key := cache.GetFlashSaleKey()
+        if redis.Exists(key) </span><span class="cov0" title="0">{
+                _, err := redis.Delete(key)
+                if err != nil </span><span class="cov0" title="0">{
+                        return false, err
+                }</span>
+                <span class="cov0" title="0">return true, nil</span>
+        }
+        <span class="cov0" title="0">return false, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file29" style="display: none">package product_service
+
+import "flash_sale/models"
+
+type Product struct {
+        ID       uint
+        Name     string
+        Stock    int
+        Price    float32
+        IsActive bool
+}
+
+func (p *Product) Add() error <span class="cov0" title="0">{
+        product := map[string]interface{}{
+                "name":      p.Name,
+                "stock":     p.Stock,
+                "price":     p.Price,
+                "is_active": p.IsActive,
+        }
+
+        if err := models.AddProduct(product); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (p *Product) Edit() error <span class="cov0" title="0">{
+        return models.EditProduct(p.ID, map[string]interface{}{
+                "name":      p.Name,
+                "stock":     p.Stock,
+                "price":     p.Price,
+                "is_active": p.IsActive,
+        })
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
